@@ -1,0 +1,10 @@
+.vs
+.vsconfig
+
+Library
+Logs
+obj
+UserSettings
+
+Assembly-CSharp.csproj
+Simple 2D Game.sln

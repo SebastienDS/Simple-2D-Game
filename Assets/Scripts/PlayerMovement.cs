@@ -9,6 +9,7 @@ public class PlayerMovement : MonoBehaviour
 
     public bool isJumping;
     public bool isGrounded;
+    public bool isClimbing;
 
     public Transform groundCheck;
     public float groundCheckRadius;
@@ -20,13 +21,15 @@ public class PlayerMovement : MonoBehaviour
 
     private Vector3 velocity = Vector3.zero;
     private float horizontalMovement;
+    private float verticalMovement;
 
 
     private void FixedUpdate()
     {
         horizontalMovement = Input.GetAxis("Horizontal") * moveSpeed * Time.deltaTime;
+        verticalMovement = Input.GetAxis("Vertical") * moveSpeed * Time.deltaTime;
 
-        MovePlayer(horizontalMovement);
+        MovePlayer(horizontalMovement, verticalMovement);
         Flip(rb.velocity.x);
 
         float characterVelocity = Mathf.Abs(rb.velocity.x);
@@ -43,15 +46,21 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    void MovePlayer(float horizontalMovement)
+    void MovePlayer(float horizontalMovement, float verticalMovement)
     {
-        Vector3 targetVelocity = new Vector2(horizontalMovement, rb.velocity.y);
-        rb.velocity = Vector3.SmoothDamp(rb.velocity, targetVelocity, ref velocity, 0.05f);
+        if (!isClimbing) {
+            Vector3 targetVelocity = new Vector2(horizontalMovement, rb.velocity.y);
+            rb.velocity = Vector3.SmoothDamp(rb.velocity, targetVelocity, ref velocity, 0.05f);
 
-        if (isJumping)
-        {
-            rb.AddForce(new Vector2(0f, jumpForce));
-            isJumping = false;
+            if (isJumping)
+            {
+                rb.AddForce(new Vector2(0f, jumpForce));
+                isJumping = false;
+            }
+        }
+        else {
+            Vector3 targetVelocity = new Vector2(rb.velocity.x, verticalMovement);
+            rb.velocity = Vector3.SmoothDamp(rb.velocity, targetVelocity, ref velocity, 0.05f);
         }
     }
 
